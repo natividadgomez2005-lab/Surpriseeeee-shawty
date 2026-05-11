@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>👻 Pokémon Secret Game</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      text-align: center;
+      background: radial-gradient(circle, #0b0b1f, #000);
+      color: white;
+      overflow: hidden;
+    }
+
+    .page { display: none; padding-top: 60px; }
+    .active { display: block; }
+
+    button {
+      padding: 12px 18px;
+      margin: 10px;
+      border-radius: 12px;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .yes { background: #ff4da6; color: white; }
+
+    .no {
+      background: #444;
+      color: white;
+      position: absolute;
+    }
+
+    .shake { animation: shake 0.2s infinite; }
+
+    @keyframes shake {
+      0% { transform: translate(2px,2px); }
+      25% { transform: translate(-3px,2px); }
+      50% { transform: translate(-2px,-2px); }
+      75% { transform: translate(3px,-1px); }
+      100% { transform: translate(1px,-2px); }
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+
+    .meme { width: 160px; margin: 10px; border-radius: 10px; }
+
+    .heart {
+      font-size: 30px;
+      animation: float 2s infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0); }
+    }
+
+    .popup {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ff4da6;
+      padding: 10px 15px;
+      border-radius: 12px;
+      display: none;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    .glitch {
+      animation: glitch 0.2s infinite;
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(1px,0); }
+      50% { transform: translate(-2px,1px); }
+      100% { transform: translate(1px,0); }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="popup" id="popup">👻</div>
+
+<audio id="bgm" loop autoplay></audio>
+
+<!-- PAGE 1 -->
+<div class="page active" id="p1">
+  <h1>👻 do you want to hear something funny?</h1>
+
+  <button class="yes" onclick="go('p2'); vibe()">yes 💖</button>
+  <button class="no" id="noBtn">no 😭</button>
+
+  <img class="meme" style="display:none" src="https://i.imgflip.com/30b1gx.jpg">
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="p2">
+  <h1>👻 Gengar appears</h1>
+
+  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png" width="160">
+
+  <p>what are 3 words nati says a lot hmm???</p>
+
+  <input id="ans">
+  <br><br>
+  <button onclick="check()">submit</button>
+
+  <p style="opacity:0.5">hint: try “nati” or “home” 👀</p>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="p3">
+  <h1>💀 correct path unlocked</h1>
+
+  <img class="meme" src="https://i.imgflip.com/4/1bij.jpg">
+
+  <p>something is watching… 👀</p>
+
+  <button onclick="go('p4')">continue</button>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" id="p4">
+  <h1>💌 message</h1>
+
+  <p>
+    LOL hehe i just wasted so much of ur time because i love bothering you so much.
+  </p>
+
+  <button onclick="go('p5')">rate it</button>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page" id="p5">
+  <h1>😌 rate it</h1>
+
+  <input id="rate" type="number" min="1" max="10">
+  <button onclick="rate()">send</button>
+
+  <div id="out"></div>
+</div>
+
+<!-- PAGE 6 SECRET ENDING -->
+<div class="page" id="p6">
+  <h1>🌟 TRUE ENDING</h1>
+
+  <p>Trainer Bond Unlocked 💛</p>
+
+  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/501.png" width="120">
+  <p>🐧 Oshawott appears</p>
+
+  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png" width="160">
+  <p>🐉 Rayquaza watches over you</p>
+
+  <p>you found the hidden ending…</p>
+  <p>home is wherever you are 💛</p>
+</div>
+
+<script>
+
+/* MUSIC (PLACEHOLDER - YOU CAN REPLACE LATER) */
+let bgm = document.getElementById("bgm");
+
+function playCute(){
+  bgm.src = "data:audio/mp3;base64,"; // silent placeholder
+  bgm.play().catch(()=>{});
+}
+
+function playBattle(){
+  bgm.src = "data:audio/mp3;base64,"; // silent placeholder
+  bgm.play().catch(()=>{});
+}
+
+window.onload = playCute;
+
+/* CONFETTI */
+const c = document.getElementById("confetti");
+const ctx = c.getContext("2d");
+c.width = window.innerWidth;
+c.height = window.innerHeight;
+
+let p = Array.from({length: 60}, ()=>({
+  x: Math.random()*c.width,
+  y: Math.random()*c.height
+}));
+
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+  p.forEach(e=>{
+    ctx.fillStyle="#ff4da6";
+    ctx.fillRect(e.x,e.y,3,3);
+    e.y += 1;
+    if(e.y>c.height) e.y=0;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* VIBRATION */
+function vibe(){
+  if(navigator.vibrate){
+    navigator.vibrate([100,50,100]);
+  }
+}
+
+/* NO BUTTON CHAOS = FINAL BATTLE ENDING */
+const noBtn = document.getElementById("noBtn");
+const popup = document.getElementById("popup");
+
+noBtn.addEventListener("mouseover", ()=>{
+  vibe();
+
+  let x = Math.random()*(window.innerWidth-100);
+  let y = Math.random()*(window.innerHeight-100);
+
+  noBtn.style.left = x+"px";
+  noBtn.style.top = y+"px";
+  noBtn.classList.add("shake");
+
+  document.body.classList.add("glitch");
+
+  popup.style.display = "block";
+  popup.innerText = "⚔️ BATTLE STARTED";
+
+  setTimeout(()=>{
+    popup.style.display="none";
+    document.body.classList.remove("glitch");
+    triggerBattleEnding();
+  },700);
+});
+
+function triggerBattleEnding(){
+  playBattle();
+
+  document.body.innerHTML = `
+    <div style="padding-top:100px; text-align:center;">
+      <h1>⚔️ FINAL BATTLE</h1>
+      <p>you chose NO...</p>
+      <h2>GAME OVER 💔</h2>
+      <p>restart and choose YES 💗</p>
+    </div>
+  `;
+}
+
+/* NAV */
+function go(p){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  document.getElementById(p).classList.add("active");
+}
+
+/* ANSWER */
+function check(){
+  let v = document.getElementById("ans").value.toLowerCase();
+
+  vibe();
+
+  if(v.includes("nati") || v.includes("home") || v.includes("rayquaza")){
+    go("p6");
+  } else {
+    go("p3");
+  }
+}
+
+/* RATE */
+function rate(){
+  let r = document.getElementById("rate").value;
+
+  document.getElementById("out").innerHTML =
+  `<h2>${r}/10 💗</h2>
+   <p>💋💋💋💋💋💋💋</p>`;
+
+  setTimeout(()=>go("p6"), 1200);
+}
+
+</script>
+
+</body>
+</html>
